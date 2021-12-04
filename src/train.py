@@ -11,8 +11,8 @@ def batch_training(model: nn.Module, X_batch: torch.FloatTensor, Y_batch: torch.
     This function will train the model during one batch. It returns the loss obtained in the batch.
     """
     # Locate data in the corresponding device
-    X_batch.to(device)
-    Y_batch.to(device)
+    X_batch = X_batch.to(device)
+    Y_batch = Y_batch.to(device)
 
     # Reset Gradients
     optimizer.zero_grad()
@@ -37,8 +37,8 @@ def batch_testing(model: nn.Module, X_batch: torch.FloatTensor, Y_batch: torch.I
     This function will test the model during one batch.
     """
     # Locate data in the corresponding device
-    X_batch.to(device)
-    Y_batch.to(device)
+    X_batch = X_batch.to(device)
+    Y_batch = Y_batch.to(device)
 
     # Forward step: Making predictions and computing the loss
     model.eval()
@@ -60,10 +60,10 @@ def training_epoch(model, trainDataLoader, testDataLoader, loss_function, optimi
     batch_loss = []
 
     # Training one epoch
-    for X_batch, Y_batch in trainDataLoader:
+    for X_batch, Y_batch in tqdm.tqdm(trainDataLoader, desc='Training'):
         training_loss = batch_training(
             model, X_batch, Y_batch, loss_function, optimizer, device)
-        batch_loss.append(training_loss)
+        batch_loss.append(training_loss.cpu().item())
 
     average_loss = np.mean(np.array(batch_loss))
 
@@ -71,11 +71,11 @@ def training_epoch(model, trainDataLoader, testDataLoader, loss_function, optimi
     batch_metric = []
 
     # Testing one epoch
-    for X_batch, Y_batch in testDataLoader:
+    for X_batch, Y_batch in tqdm.tqdm(testDataLoader, desc='Testing'):
         test_loss, metric = batch_testing(
             model, X_batch, Y_batch, loss_function, metric_function, device)
-        batch_test_loss.append(test_loss)
-        batch_metric.append(metric)
+        batch_test_loss.append(test_loss.cpu().item())
+        batch_metric.append(metric.cpu().item())
 
     average_test_loss = np.mean(np.array(batch_test_loss))
     average_metric = np.mean(np.array(batch_metric))
@@ -107,7 +107,8 @@ def train_model(model: nn.Module, trainDataLoader: DataLoader, testDataLoader: D
     }
 
     # Iterating over number of epochs
-    for epoch in tqdm(range(epochs)):
+    for epoch in range(epochs):
+        print(f'Starting epoch {epoch + 1}')
 
         # Training
         epoch_loss = training_epoch(
@@ -117,10 +118,9 @@ def train_model(model: nn.Module, trainDataLoader: DataLoader, testDataLoader: D
         for key, loss in epoch_loss.keys():
             losses[key].extend(loss)
 
-        # Every 10 epochs print training stats
-        if (epoch + 1) % 10 == 0:
-            print(f'Results for epoch {epoch + 1}')
-            print('------------------------------')
-            print(f'Training loss average: {epoch_loss["training_average"]}')
-            print(f'Test loss average: {epoch_loss["testing_average"]}')
-            print(f'Metric average: {epoch_loss["metric_average"]}')
+        # print training stats after epoch
+        print(f'Results for epoch {epoch + 1}')
+        print('------------------------------')
+        print(f'Training loss average: {epoch_loss["training_average"]}')
+        print(f'Test loss average: {epoch_loss["testing_average"]}')
+        print(f'Metric average: {epoch_loss["metric_average"]}')

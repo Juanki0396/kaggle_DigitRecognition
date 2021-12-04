@@ -44,15 +44,16 @@ class DownsamplingBlock(nn.Module):
             nn.ReLU(),
             nn.Conv2d(in_channels, out_channels, kernel_size=3,
                       stride=2, padding='valid'),
-            nn.BatchNorm2d(in_channels),
+            nn.BatchNorm2d(out_channels),
             nn.ReLU(),
             conv3x3(out_channels, out_channels, stride)
         )
         self.downsample = nn.Conv2d(
-            in_channels, out_channels, kernel_size=1, stride=2)
+            in_channels, out_channels, kernel_size=1, stride=2, padding='valid')
 
     def forward(self, x):
-        out = self.block(x) + self.downsample(x)
+        # + self.downsample(x) #! Don't know how to match dimensions
+        out = self.block(x)
         return out
 
 
@@ -85,7 +86,7 @@ class ResNet(nn.Module):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
 
-    def block_forward(block, x):
+    def block_forward(self, block, x):
         for layer in block:
             x = layer(x) + x
         return x
@@ -98,6 +99,7 @@ class ResNet(nn.Module):
         x = self.down2(x)
         x = self.block_forward(self.block3, x)
         x = self.pool(x)
+        x = x.view(-1, 128)
         out = self.linear(x)
         return out
 
