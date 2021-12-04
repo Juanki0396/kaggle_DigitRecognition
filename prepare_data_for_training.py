@@ -22,7 +22,7 @@ if os.path.exists(save_dir) is False:
 
 # Saving files
 train_dataset_path = os.path.join(save_dir, 'train_dataset.csv')
-training_df.to_csv(train_dataset_path)
+training_df.to_csv(train_dataset_path, index=False)
 
 test_dataset_path = os.path.join(save_dir, 'test_dataset.csv')
-test_df.to_csv(test_dataset_path)
+test_df.to_csv(test_dataset_path, index=False)
