@@ -22,6 +22,7 @@ class MNIST_TrainingDataset(dataset):
         self.X = torch.from_numpy(X)
         Y = reader['label'].to_numpy().reshape(-1, 1)
         self.Y = torch.from_numpy(Y)
+        print(f'Created dataset with {len(self)} examples.')
 
     def __len__(self):
         return self.X.shape[0]
