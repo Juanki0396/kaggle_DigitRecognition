@@ -11,9 +11,9 @@ class MNIST_TrainingDataset(dataset):
     Dataset torch class that will contain data to train or test the CNN.
     """
 
-    def __init__(self, csv_path, isTest=False):
+    def __init__(self, csv_path):
         """ 
-        Create an instance of the dataset from a csv. If isTest is True, mean and std must be given in order to normalize the data.
+        Create an instance of the dataset from a csv.
         """
 
         reader = pd.read_csv(csv_path)
