@@ -2,6 +2,8 @@
 import numpy as np
 import torch
 import torch.nn as nn
+import tqdm
+from torch.utils.data import Dataset, DataLoader
 
 
 def batch_training(model: nn.Module, X_batch: torch.FloatTensor, Y_batch: torch.FloatTensor, loss_function, optimizer, device):
@@ -86,3 +88,39 @@ def training_epoch(model, trainDataLoader, testDataLoader, loss_function, optimi
     }
 
     return epoch_loss
+
+
+def train_model(model: nn.Module, trainDataLoader: DataLoader, testDataLoader: DataLoader, epochs: int, optimizer, lossFuction, metric, device) -> dict:
+    """ 
+    Training model function: it will train the model for a number of epochs, with the corresponding optimizer. 
+    It will return the corresponding losses and metrics in a dictionary.
+    """
+    # Send model to the corresponding device
+    model.to(device)
+
+    # Creating loss dictionary
+    losses = {
+        'training_batchs': [],
+        'training_average': [],
+        'testing_average': [],
+        'metric_average': []
+    }
+
+    # Iterating over number of epochs
+    for epoch in tqdm(range(epochs)):
+
+        # Training
+        epoch_loss = training_epoch(
+            model, trainDataLoader, testDataLoader, lossFuction, optimizer, metric, device)
+
+        # Updating loss dictionary
+        for key, loss in epoch_loss.keys():
+            losses[key].extend(loss)
+
+        # Every 10 epochs print training stats
+        if (epoch + 1) % 10 == 0:
+            print(f'Results for epoch {epoch + 1}')
+            print('------------------------------')
+            print(f'Training loss average: {epoch_loss["training_average"]}')
+            print(f'Test loss average: {epoch_loss["testing_average"]}')
+            print(f'Metric average: {epoch_loss["metric_average"]}')
