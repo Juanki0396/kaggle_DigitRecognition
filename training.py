@@ -1,4 +1,5 @@
 
+import os
 import torch
 from torch.utils.data import DataLoader
 import numpy as np
@@ -21,7 +22,7 @@ print('Working device')
 
 print('Setting up hyperparameters')
 
-epochs = 100
+epochs = 1
 lr = 1e-3
 batch_size = 64
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -43,3 +44,63 @@ testDataLoader = DataLoader(testDatset, batch_size=1)
 
 losses = train.train_model(model, trainDataLoader, testDataLoader,
                            epochs, optimizer, lossFunction, lossFunction, device)
+
+# Serializing the model
+
+saveDir = f'models/Adam_ep_{epochs}_lr_{lr}_batch_{batch_size}'
+saveName = 'model'
+
+if not os.path.exists(saveDir):
+    os.mkdir(saveDir)
+
+savePath = os.path.join(saveDir, saveName)
+
+torch.save(model.state_dict(), savePath)
+
+# Learning plots
+# Training and testing epochs curve
+epochs = list(range(epochs))
+average_train = losses['training_average']
+average_test = losses['testing_average']
+
+fig, axes = plt.subplots()
+axes.plot(epochs, average_train, label='Training')
+axes.plot(epochs, average_test, label='Testing')
+axes.set_xlabel('Epochs')
+axes.set_ylabel('Loss')
+axes.set_title('Training_curve')
+axes.legend()
+
+figPath = os.path.join(saveDir, 'training_vs_testing.png')
+
+fig.savefig(figPath)
+
+# Learning Curve
+
+train_loss = losses['training_batchs']
+steps = list(range(len(train_loss)))
+
+fig, axes = plt.subplots()
+axes.plot(steps, train_loss, label='Training')
+axes.set_xlabel('Steps')
+axes.set_ylabel('Loss')
+axes.set_title('Training_curve')
+
+figPath = os.path.join(saveDir, 'learning_curve.png')
+
+fig.savefig(figPath)
+
+# Metric curve
+
+train_loss = losses['metric_average']
+steps = list(range(epochs))
+
+fig, axes = plt.subplots()
+axes.plot(steps, train_loss, label='Metric')
+axes.set_xlabel('Epochs')
+axes.set_ylabel('Metric')
+axes.set_title('Metric_curve')
+
+figPath = os.path.join(saveDir, 'metric_curve.png')
+
+fig.savefig(figPath)

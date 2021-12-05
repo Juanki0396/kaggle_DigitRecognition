@@ -115,8 +115,11 @@ def train_model(model: nn.Module, trainDataLoader: DataLoader, testDataLoader: D
             model, trainDataLoader, testDataLoader, lossFuction, optimizer, metric, device)
 
         # Updating loss dictionary
-        for key, loss in epoch_loss.keys():
-            losses[key].extend(loss)
+        for key, loss in epoch_loss.items():
+            try:
+                losses[key].extend(loss)
+            except:
+                losses[key].append(loss)
 
         # print training stats after epoch
         print(f'Results for epoch {epoch + 1}')
@@ -124,3 +127,5 @@ def train_model(model: nn.Module, trainDataLoader: DataLoader, testDataLoader: D
         print(f'Training loss average: {epoch_loss["training_average"]}')
         print(f'Test loss average: {epoch_loss["testing_average"]}')
         print(f'Metric average: {epoch_loss["metric_average"]}')
+
+    return losses
