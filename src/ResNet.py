@@ -116,3 +116,6 @@ def resnet30():
     Create a ResNet model of 30 layers
     """
     return ResNet(6)
+
+
+# TODO Create a function to load a pretrained model
