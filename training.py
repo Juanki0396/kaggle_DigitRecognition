@@ -22,7 +22,7 @@ print('Working device')
 
 print('Setting up hyperparameters')
 
-epochs = 1
+epochs = 5
 lr = 1e-3
 batch_size = 64
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -59,13 +59,13 @@ torch.save(model.state_dict(), savePath)
 
 # Learning plots
 # Training and testing epochs curve
-epochs = list(range(epochs))
+steps = list(range(epochs))
 average_train = losses['training_average']
 average_test = losses['testing_average']
 
 fig, axes = plt.subplots()
-axes.plot(epochs, average_train, label='Training')
-axes.plot(epochs, average_test, label='Testing')
+axes.plot(steps, average_train, label='Training')
+axes.plot(steps, average_test, label='Testing')
 axes.set_xlabel('Epochs')
 axes.set_ylabel('Loss')
 axes.set_title('Training_curve')
@@ -92,8 +92,9 @@ fig.savefig(figPath)
 
 # Metric curve
 
-train_loss = losses['metric_average']
 steps = list(range(epochs))
+train_loss = losses['metric_average']
+
 
 fig, axes = plt.subplots()
 axes.plot(steps, train_loss, label='Metric')
