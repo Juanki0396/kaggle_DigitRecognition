@@ -118,4 +118,12 @@ def resnet30():
     return ResNet(6)
 
 
-# TODO Create a function to load a pretrained model
+def load_pretrained_model(model: nn.Module, savePath):
+    """ 
+    Load parameters from a pretrained model to be used for inference. It needs the model to be
+    updated as input.
+    """
+    state_dict = torch.load(savePath)
+    model.load_state_dict(state_dict)
+    model.eval()
+    return model

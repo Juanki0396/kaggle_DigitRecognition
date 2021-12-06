@@ -11,17 +11,24 @@ class MNIST_TrainingDataset(Dataset):
     Dataset torch class that will contain data to train or test the CNN.
     """
 
-    def __init__(self, csv_path):
+    def __init__(self, csv_path, isKaggleTest=False):
         """ 
         Create an instance of the dataset from a csv.
         """
 
         reader = pd.read_csv(csv_path)
-        X = reader[reader.columns[1:]].to_numpy(
-            dtype='float').reshape((-1, 1, 28, 28))
-        self.X = torch.from_numpy(X).to(dtype=torch.float32)
-        Y = reader['label'].to_numpy().reshape(-1)
-        self.Y = torch.from_numpy(Y).to(dtype=torch.long)
+        if isKaggleTest:
+            X = reader[reader.columns[:]].to_numpy(
+                dtype='float').reshape((-1, 1, 28, 28))
+            self.X = torch.from_numpy(X).to(dtype=torch.float32)
+            Y = np.zeros((X.shape[0]))
+            self.Y = torch.from_numpy(Y).to(dtype=torch.long)
+        else:
+            X = reader[reader.columns[1:]].to_numpy(
+                dtype='float').reshape((-1, 1, 28, 28))
+            self.X = torch.from_numpy(X).to(dtype=torch.float32)
+            Y = reader['label'].to_numpy().reshape(-1)
+            self.Y = torch.from_numpy(Y).to(dtype=torch.long)
         print(f'Created dataset with {len(self)} examples.')
 
     def __len__(self):
