@@ -11,12 +11,14 @@ class MNIST_TrainingDataset(Dataset):
     Dataset torch class that will contain data to train or test the CNN.
     """
 
-    def __init__(self, csv_path, isKaggleTest=False):
+    def __init__(self, csv_path=None, dataframe=None, isKaggleTest=False):
         """ 
         Create an instance of the dataset from a csv.
         """
-
-        reader = pd.read_csv(csv_path)
+        if csv_path is not None:
+            reader = pd.read_csv(csv_path)
+        elif dataframe is not None:
+            reader = dataframe
         if isKaggleTest:
             X = reader[reader.columns[:]].to_numpy(
                 dtype='float').reshape((-1, 1, 28, 28))

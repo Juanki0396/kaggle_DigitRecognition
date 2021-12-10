@@ -1,10 +1,43 @@
-
 import os
+
+import argparse
 import torch
-from torch.utils.data import DataLoader
-import numpy as np
 import matplotlib.pyplot as plt
-from src import dataset, train, ResNet
+import pandas as pd
+
+from torch.utils.data import DataLoader
+from src import dataset, train, ResNet, data_preprocess
+
+
+# Parsing arguments
+
+my_parser = argparse.ArgumentParser(prog='training',
+                                    description='Traininng a homemade ResNet model')
+
+my_parser.add_argument('--path',
+                       help='Path from the training csv.',
+                       default='data/train.csv')
+
+my_parser.add_argument('--outputPath',
+                       help='Directory to save model and training plots',
+                       default=None)
+
+my_parser.add_argument('--learningRate',
+                       help='Setting up learning rate',
+                       type=float,
+                       default=1e-3)
+
+my_parser.add_argument('--epochs',
+                       help='Setting up the number of training epochs',
+                       type=int,
+                       default=5)
+
+my_parser.add_argument('--batchSize',
+                       help='Setting up the batch size',
+                       type=int,
+                       default=64)
+
+args = my_parser.parse_args()
 
 # Creating the model
 
@@ -22,20 +55,21 @@ print('Working device')
 
 print('Setting up hyperparameters')
 
-epochs = 5
-lr = 1e-3
-batch_size = 64
+epochs = args.epochs
+lr = args.learningRate
+batch_size = args.batchSize
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 lossFunction = torch.nn.CrossEntropyLoss()
 
+# Defining data paths, preprocessing it, creates dataset and creating data loaders
 
-# Defining data paths and creating data loaders
+dataPath = args.path
 
-trainPath = r'data/processed/train_dataset.csv'
-testPath = r'data/processed/test_dataset.csv'
+print(f'Spliting the dataset from: {dataPath}')
+training_df, test_df = data_preprocess.split_dataset(dataPath, train_ratio=0.9)
 
-trainDataset = dataset.MNIST_TrainingDataset(trainPath)
-testDatset = dataset.MNIST_TrainingDataset(testPath)
+trainDataset = dataset.MNIST_TrainingDataset(dataframe=training_df)
+testDatset = dataset.MNIST_TrainingDataset(dataframe=test_df)
 
 trainDataLoader = DataLoader(trainDataset, batch_size=batch_size, shuffle=True)
 testDataLoader = DataLoader(testDatset, batch_size=1)
@@ -47,7 +81,11 @@ losses = train.train_model(model, trainDataLoader, testDataLoader,
 
 # Serializing the model
 
-saveDir = f'models/Adam_ep_{epochs}_lr_{lr}_batch_{batch_size}'
+if args.outputPath is not None:
+    saveDir = args.outputPath
+else:
+    saveDir = f'models/Adam_ep_{epochs}_lr_{lr}_batch_{batch_size}'
+
 saveName = 'model'
 
 if not os.path.exists(saveDir):
