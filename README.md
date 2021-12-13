@@ -1,4 +1,4 @@
-![banner](digit_recognition.png)
+![banner](imgs/digit_recognition.png)
 
 # Kaggle Digit Recognition
 
