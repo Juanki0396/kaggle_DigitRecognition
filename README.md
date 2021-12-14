@@ -32,6 +32,12 @@ These architecture has allowed me to achieve a 0.985 score in the kaggle competi
 
 ## Guide
 
+### Installing python dependencies
+
+In order to make everything works fine, you must install the python dependencies first. It is recomended to do it in a virtual enviroment. Once the enviroment is activated and you are in the repository directory, run the following command:
+
+    pip install -r requirements
+
 ### Training
 
 Training step is implmented in training.py. This scrpits works as a light command program that allows you to set your own training. An example of how is it used is shown below:
