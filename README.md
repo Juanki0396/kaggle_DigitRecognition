@@ -15,6 +15,7 @@ learned in the previous months.
 ## Table of contents
 - [Model info](#model-info)
 - [Guide](#guide)
+    - [Installing python dependencies](#installing-python-dependencies)
     - [Training](#training)
     - [Inference](#inference)
     - [Docker for inference](#docker-for-inference)
