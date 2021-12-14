@@ -123,7 +123,11 @@ def load_pretrained_model(model: nn.Module, savePath):
     Load parameters from a pretrained model to be used for inference. It needs the model to be
     updated as input.
     """
-    state_dict = torch.load(savePath)
+    if torch.cuda.is_available():
+        map_location = torch.device('cuda')
+    else:
+        map_location = torch.device('cpu')
+    state_dict = torch.load(savePath, map_location=map_location)
     model.load_state_dict(state_dict)
     model.eval()
     return model

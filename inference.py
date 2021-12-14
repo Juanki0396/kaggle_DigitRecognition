@@ -19,8 +19,8 @@ my_parser.add_argument('--csvPath',
                        default='data/test.csv')
 
 my_parser.add_argument('--outputPath',
-                       help='Directory to where the predictions will be stored. Default option is test.csv directory',
-                       default=None)
+                       help='Directory to where the predictions will be stored.',
+                       default='data/')
 
 my_parser.add_argument('--modelPath',
                        help='Path from where the model parameters are loaded.',
@@ -57,10 +57,6 @@ with torch.no_grad():
 
 df = pd.DataFrame(results, columns=['ImageId', 'Label'])
 
-if args.outputPath is not None:
-    savePath = args.outputPath
-else:
-    datasetDir = os.sep.join(datasetPath.split(os.sep)[:-1])
-    savePath = os.path.join(datasetDir, 'predictions.csv')
+savePath = os.path.join(args.outputPath, 'predictions.csv')
 
 df.to_csv(savePath, index=False)
